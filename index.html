@@ -11,6 +11,10 @@
         h1 { color: #2563eb; }
         a.button { display: inline-block; background: #2563eb; color: #fff; padding: 0.8em 2em; border-radius: 0.5em; text-decoration: none; margin-top: 1.5em; font-size: 1.1em;}
         a.button:hover { background: #1d4ed8; }
+        .menu-group { margin-bottom: 2em; }
+        .menu-title { font-size: 1.15em; font-weight: 600; margin-bottom: 0.8em; color: #1d4ed8; }
+        .menu-list { padding-left: 1.5em; }
+        .menu-list a.button { margin-top: 0.8em; margin-bottom: 0.5em; }
     </style>
 </head>
 <body>
@@ -18,10 +22,19 @@
         <img src="https://awat.ac.th/images/header-132-1/logo.png" alt="School Logo" style="display:block; margin:0 auto 24px auto; max-width:140px; height:auto;">
         <h1 class="text-3xl font-bold mb-4">小学中文词汇测试</h1>
         <p class="mb-4 text-lg">欢迎来到 WatAngthongSchool 中文词汇测试平台。</p>
-        <a class="button" href="ChineseTestP6.html" target="_blank">进入六年级词汇测试（ChineseTestP6.html）</a>
-        <a class="button" href="ChineseCharactersP6.html" target="_blank">进入六年级选词填空（ChineseCharactersP6.html）</a>
+
+        <!-- 六年级目录 -->
+        <div class="menu-group">
+            <div class="menu-title">六年级</div>
+            <div class="menu-list">
+                <a class="button" href="ChineseTestP6.html" target="_blank">进入六年级词汇测试（ChineseTestP6.html）</a>
+                <a class="button" href="ChineseCharactersP6.html" target="_blank">进入六年级选词填空（ChineseCharactersP6.html）</a>
+            </div>
+        </div>
+        <!-- 五年级直出 -->
         <a class="button" href="ChineseTestP5.html" target="_blank">进入五年级词汇测试（ChineseTestP5.html）</a>
         <a class="button" href="ChineseCharactersP5.html" target="_blank">进入五年级选词填空（ChineseCharactersP5.html）</a>
+        
         <iframe src="https://drive.google.com/file/d/1sJoILar-nodGFu5WKXjkfIpVuS_WVIUB/view?usp=drive_link" width="100%" height="600px" frameborder="0"></iframe>
         
         <p class="mt-8 text-sm text-gray-500">© 2025 WatAngthongSchool</p>
