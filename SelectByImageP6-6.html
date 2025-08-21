@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>看图识词游戏</title>
+    <!-- Load Tailwind CSS framework for rapid UI design. -->
+    <!-- Note: This link may not load when opening the file locally. It is recommended to use a local server for preview. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Core styles to ensure correct display locally. */
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8f9fa; /* Light background */
+            color: #343a40; /* Dark text */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            margin: 0;
+        }
+        .game-container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        /* Header section for the logo and title */
+        .header-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .logo {
+            max-width: 200px;
+            height: auto;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .image-container {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            height: 450px; /* Set a fixed height for image container */
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* This makes the image cover the container without distortion */
+            display: block;
+        }
+        /* Fallback for button options layout, in case Tailwind fails to load */
+        #options-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        /* For desktop/tablet screens, switch to 4 columns */
+        @media (min-width: 768px) {
+            #options-container {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+            .header-section {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .logo {
+                margin-right: 1.5rem;
+                margin-bottom: 0;
+            }
+        }
+        .btn-option {
+            background-color: #e9ecef; /* Light gray */
+            color: #343a40;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 100%;
+            text-align: center;
+            font-size: 1.125rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-option:hover {
+            background-color: #dee2e6;
+            transform: translateY(-2px);
+        }
+        .btn-option.correct {
+            background-color: #28a745; /* Green for correct */
+            color: white;
+            animation: pulseCorrect 0.5s ease-out;
+        }
+        .btn-option.incorrect {
+            background-color: #dc3545; /* Red for incorrect */
+            color: white;
+            animation: shakeIncorrect 0.5s ease-out;
+        }
+        #next-question-btn, #restart-game-btn {
+            background-color: #007bff; /* Blue */
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            display: inline-block; /* Ensure button is not full width by default */
+        }
+        #next-question-btn:hover, #restart-game-btn:hover {
+            background-color: #0056b3;
+        }
+        @keyframes pulseCorrect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shakeIncorrect {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- New Header Section with Logo and Title -->
+        <div class="header-section">
+            <img src="https://awat.ac.th/images/header-132-1/logo.png" alt="Logo" class="logo">
+            <h1 class="text-3xl font-bold text-blue-600">看图识词游戏</h1>
+        </div>
+
+        <p class="text-gray-600 mb-8">请根据图片内容，选择正确的汉语词语。</p>
+		<p class="text-gray-600 mb-8">โปรดเลือกคำภาษาจีนที่ถูกต้องตามเนื้อหาของภาพ</p>
+		
+
+        <div class="image-container mb-8">
+            <!-- Image URL can be replaced here with your image link. -->
+            <img id="game-image" src="" alt="Game Question Image">
+        </div>
+
+        <div id="question-area" class="space-y-6">
+            <h2 class="text-2xl font-semibold text-gray-800" id="question-text"></h2>
+            <!-- New element for displaying pinyin -->
+            <p id="pinyin-display" class="text-xl text-gray-700 font-semibold mb-4"></p>
+
+            <div id="options-container" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Buttons will be generated here by JavaScript -->
+            </div>
+
+            <div id="feedback-message" class="text-xl font-bold mt-6 hidden"></div>
+
+            <button id="next-question-btn" class="hidden mt-8">下一题</button>
+        </div>
+
+        <div id="game-over-area" class="hidden">
+            <h2 class="text-3xl font-bold mb-4 text-blue-600">游戏结束！</h2>
+            <p class="text-xl text-gray-700 mb-4">你的得分是：<span id="final-score" class="font-bold text-green-600">0</span> / <span id="total-questions" class="font-bold text-gray-800">0</span></p>
+            <button id="restart-game-btn">再玩一次</button>
+        </div>
+
+        <div class="mt-8 text-gray-500 text-sm">
+            <p>分数：<span id="score">0</span> / <span id="total-count">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Define the questions and options for the game
+           const questions = [
+                {
+                    image: 'https://i.postimg.cc/XYnZHrtZ/image.png',
+                    correctWord: "厕所",
+                    pinyin: "cè suǒ", // 新增拼音
+                    options: ["住宅", "厕所", "浴室", "书房"],
+                    questionText: "图中是什么地方？สถานที่ในภาพคือที่ไหน"
+                },
+                {
+                    image: 'https://i.postimg.cc/Hk3rfpC6/image.png',
+                    correctWord: "书房",
+                    pinyin: "shū fáng", // 新增拼音
+                    options: ["卧室", "厨房", "书房", "浴室"],
+                    questionText: "图中是什么地方？สถานที่ในภาพคือที่ไหน"
+                },
+                {
+                    image: 'https://i.postimg.cc/WzM3SVn6/image.png',
+                    correctWord: "卧室",
+                    pinyin: "Wò shì", // 新增拼音
+                    options: ["厕所", "厨房", "卧室", "书房"],
+                    questionText: "图中是什么地方？สถานที่ในภาพคือที่ไหน"
+                },
+                {
+                    image: 'https://i.postimg.cc/jdHw4H30/image.png',
+                    correctWord: "厨房",
+                    pinyin: "Chú fáng", // 新增拼音
+                    options: ["卧室", "客厅", "厨房", "浴室"],
+                    questionText: "图中是什么地方？สถานที่ในภาพคือที่ไหน"
+                }
+            ];
+
+            let score = 0;
+            let currentQuestionIndex = 0;
+            let shuffledQuestions = [];
+            const totalQuestions = questions.length;
+
+            const optionsContainer = document.getElementById('options-container');
+            const feedbackMessageEl = document.getElementById('feedback-message');
+            const nextQuestionBtn = document.getElementById('next-question-btn');
+            const scoreEl = document.getElementById('score');
+            const totalCountEl = document.getElementById('total-count');
+            const gameArea = document.getElementById('question-area');
+            const gameOverArea = document.getElementById('game-over-area');
+            const finalScoreEl = document.getElementById('final-score');
+            const totalQuestionsEl = document.getElementById('total-questions');
+            const restartGameBtn = document.getElementById('restart-game-btn');
+            const gameImageEl = document.getElementById('game-image');
+            const questionTextEl = document.getElementById('question-text');
+            const pinyinDisplayEl = document.getElementById('pinyin-display'); // Get the new pinyin display element
+
+            // --- Web Audio API for feedback sounds ---
+            let audioCtx;
+            function initAudioContext() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            function playCorrectSound() {
+                initAudioContext();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 880;
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            }
+            function playIncorrectSound() {
+                initAudioContext();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.value = 150;
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.4);
+            }
+            // --- End Web Audio API ---
+
+            // Fisher-Yates shuffle algorithm
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            function loadQuestion() {
+                if (currentQuestionIndex >= shuffledQuestions.length) {
+                    endGame();
+                    return;
+                }
+
+                const question = shuffledQuestions[currentQuestionIndex];
+                optionsContainer.innerHTML = '';
+                feedbackMessageEl.classList.add('hidden');
+                nextQuestionBtn.classList.add('hidden');
+
+                // Set image source, question text and pinyin for the current question
+                gameImageEl.src = question.image;
+                questionTextEl.textContent = question.questionText;
+                pinyinDisplayEl.textContent = `(${question.pinyin})`; // Display pinyin
+
+                // Combine correct and incorrect options, then shuffle
+                const allOptions = [...question.options];
+                const shuffledOptions = shuffleArray(allOptions);
+
+                shuffledOptions.forEach(optionText => {
+                    const button = document.createElement('button');
+                    button.textContent = optionText;
+                    button.className = 'btn-option';
+                    button.onclick = () => checkAnswer(button, optionText, question.correctWord, question.pinyin);
+                    optionsContainer.appendChild(button);
+                });
+                updateScoreDisplay();
+            }
+
+            function checkAnswer(selectedButton, selectedOption, correctAnswer, correctPinyin) {
+                // Disable all buttons after an answer is chosen
+                optionsContainer.querySelectorAll('.btn-option').forEach(btn => {
+                    btn.disabled = true;
+                });
+
+                if (selectedOption === correctAnswer) {
+                    selectedButton.classList.add('correct');
+                    feedbackMessageEl.textContent = "回答正确!";
+                    feedbackMessageEl.classList.remove('text-red-600');
+                    feedbackMessageEl.classList.add('text-green-600');
+                    score++;
+                    playCorrectSound();
+                } else {
+                    selectedButton.classList.add('incorrect');
+                    // Find and highlight the correct button
+                    optionsContainer.querySelectorAll('.btn-option').forEach(btn => {
+                        if (btn.textContent === correctAnswer) {
+                            btn.classList.add('correct');
+                        }
+                    });
+                    // Update the incorrect message, including the correct answer's pinyin
+                    feedbackMessageEl.textContent = `回答错误。正确答案是: ${correctAnswer} (${correctPinyin})`;
+                    feedbackMessageEl.classList.remove('text-green-600');
+                    feedbackMessageEl.classList.add('text-red-600');
+                    playIncorrectSound();
+                }
+                feedbackMessageEl.classList.remove('hidden');
+                nextQuestionBtn.classList.remove('hidden');
+                updateScoreDisplay();
+            }
+
+            function updateScoreDisplay() {
+                scoreEl.textContent = score;
+                totalCountEl.textContent = currentQuestionIndex;
+            }
+
+            function endGame() {
+                gameArea.classList.add('hidden');
+                gameOverArea.classList.remove('hidden');
+                finalScoreEl.textContent = score;
+                totalQuestionsEl.textContent = shuffledQuestions.length;
+            }
+
+            function startGame() {
+                shuffledQuestions = shuffleArray([...questions]);
+                score = 0;
+                currentQuestionIndex = 0;
+                gameArea.classList.remove('hidden');
+                gameOverArea.classList.add('hidden');
+                loadQuestion();
+            }
+
+            nextQuestionBtn.addEventListener('click', () => {
+                currentQuestionIndex++;
+                loadQuestion();
+            });
+
+            restartGameBtn.addEventListener('click', startGame);
+
+            // Start the game when the page loads
+            startGame();
+        });
+    </script>
+</body>
+</html>
