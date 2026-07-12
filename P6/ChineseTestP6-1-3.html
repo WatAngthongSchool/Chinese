@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六年级，1-3课复习单词测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-lg border border-gray-200">
+        
+        <!-- Header Section -->
+        <div class="flex flex-col items-center mb-8">
+            <img src="https://awat.ac.th/images/header-132-1/logo.png" alt="School Logo" class="h-20 mb-4">
+            <h1 class="text-2xl md:text-3xl font-bold text-blue-900 mb-2">小学六年级，1-3课复习单词测试</h1>
+            <p class="text-gray-600 text-center">มาทดสอบคำศัพท์ภาษาจีนชั้นประถมศึกษาปีที่ 6 บทที่ 1-3</p>
+        </div>
+
+        <!-- Current Word Display -->
+        <div class="text-center mb-8">
+            <p class="text-gray-500 mb-2">คำศัพท์ปัจจุบัน:</p>
+            <h2 id="current-word" class="text-6xl font-bold text-gray-800 mb-2">--</h2>
+            <p id="current-pinyin" class="text-2xl text-blue-600 font-semibold">--</p>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <!-- Options will be injected here -->
+        </div>
+
+        <!-- Score Tracker -->
+        <div class="text-center text-gray-600 mb-8">
+            คะแนนปัจจุบัน: <span id="score">0</span> / <span id="total-answered">0</span>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="border-t border-gray-200 pt-8 mt-4">
+            <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                <h3 class="text-xl font-bold text-gray-800 text-center mb-4">อัปเดตคำศัพท์</h3>
+                <p class="text-center text-gray-600 mb-6">คุณสามารถอัปโหลดไฟล์ JSON เพื่ออัปเดตชุดคำศัพท์</p>
+                <div class="flex flex-col items-center gap-4">
+                    <input type="file" id="file-input" accept=".json" class="block w-full max-w-sm text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm">
+                    <button id="upload-btn" class="bg-blue-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-blue-700 transition">อัปโหลดและเริ่มเกม</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vocabulary = [
+            { chinese: '晴天', pinyin: 'qíng tiān', english: 'วันแดดออก' },
+            { chinese: '阴天', pinyin: 'yīn tiān', english: 'ท้องฟ้ามืดครึ้ม' },
+            { chinese: '刮风', pinyin: 'guā fēng', english: 'ลมพัด' },
+            { chinese: '下雨', pinyin: 'xià yǔ', english: 'ฝนตก' },
+            { chinese: '彩虹', pinyin: 'cǎi hóng', english: 'รุ้งกินน้ำ' },
+            { chinese: '多云', pinyin: 'duō yún', english: 'เมฆมาก' },
+            { chinese: '天气', pinyin: 'tiān qì', english: 'อากาศ' },
+            { chinese: '怎么样', pinyin: 'zěn me yàng', english: 'เป็นอย่างไรบ้าง' },
+            { chinese: '沙滩', pinyin: 'shā tān', english: 'ชายหาด' },
+            { chinese: '太阳伞', pinyin: 'tài yáng sǎn', english: 'ร่มกันแดด' },
+            { chinese: '好像', pinyin: 'hǎo xiàng', english: 'ดูเหมือนว่า' },
+            { chinese: '忽然', pinyin: 'hū rán', english: 'ทันใดนั้น' },
+            { chinese: '木屋', pinyin: 'mù wū', english: 'บ้านไม้' },
+            { chinese: '停', pinyin: 'tíng', english: 'หยุด' },
+            { chinese: '冷', pinyin: 'lěng', english: 'หนาว' },
+            { chinese: '热', pinyin: 'rè', english: 'ร้อน' },
+            { chinese: '凉快', pinyin: 'liáng kuai', english: 'เย็นสบาย' },
+            { chinese: '暖和', pinyin: 'nuǎn huo', english: 'อบอุ่น' },
+            { chinese: '下雪', pinyin: 'xià xuě', english: 'หิมะตก' },
+            { chinese: '打雷', pinyin: 'dǎ léi', english: 'ฟ้าร้อง' },
+            { chinese: '气温', pinyin: 'qì wēn', english: 'อุณหภูมิอากาศ' },
+            { chinese: '多少', pinyin: 'duō shǎo', english: 'เท่าไหร่' },
+            { chinese: '度', pinyin: 'dù', english: 'องศา' },
+            { chinese: '左右', pinyin: 'zuǒ yòu', english: 'ประมาณ' },
+            { chinese: '零下', pinyin: 'líng xià', english: 'ติดลบ' },
+            { chinese: '天气预报', pinyin: 'tiān qì yù bào', english: 'พยากรณ์อากาศ' },
+            { chinese: '香港', pinyin: 'xiāng gǎng', english: 'ฮ่องกง' },
+            { chinese: '春天', pinyin: 'chūn tiān', english: 'ฤดูใบไม้ผลิ' },
+            { chinese: '夏天', pinyin: 'xià tiān', english: 'ฤดูร้อน' },
+            { chinese: '秋天', pinyin: 'qiū tiān', english: 'ฤดูใบไม้ร่วง' },
+            { chinese: '冬天', pinyin: 'dōng tiān', english: 'ฤดูหนาว' },
+            { chinese: '雨季', pinyin: 'yǔ jì', english: 'ฤดูฝน' },
+            { chinese: '凉季', pinyin: 'liáng jì', english: 'ฤดูหนาว' },
+            { chinese: '季节', pinyin: 'jì jié', english: 'ฤดูกาล' },
+            { chinese: '过冬', pinyin: 'guò dōng', english: 'ผ่านฤดูหนาว' }
+        ];
+
+        let score = 0;
+        let totalAnswered = 0;
+        let currentWord = {};
+
+        function nextQuestion() {
+            currentWord = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+            document.getElementById('current-word').innerText = currentWord.chinese;
+            document.getElementById('current-pinyin').innerText = currentWord.pinyin;
+
+            let options = [currentWord.english];
+            while (options.length < 4) {
+                let randomOption = vocabulary[Math.floor(Math.random() * vocabulary.length)].english;
+                if (!options.includes(randomOption)) options.push(randomOption);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            const labels = ['A', 'B', 'C', 'D'];
+
+            options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-gray-100 hover:bg-blue-50 p-4 rounded-lg shadow-sm text-left transition border border-gray-200';
+                btn.innerHTML = `<span class="font-bold text-blue-800">${labels[index]}.</span> ${opt}`;
+                btn.onclick = () => checkAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected) {
+            totalAnswered++;
+            if (selected === currentWord.english) {
+                score++;
+            }
+            document.getElementById('score').innerText = score;
+            document.getElementById('total-answered').innerText = totalAnswered;
+            nextQuestion();
+        }
+
+        document.getElementById('upload-btn').addEventListener('click', () => {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput.files.length === 0) return;
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        vocabulary = data;
+                        score = 0;
+                        totalAnswered = 0;
+                        document.getElementById('score').innerText = 0;
+                        document.getElementById('total-answered').innerText = 0;
+                        nextQuestion();
+                        alert('อัปเดตคำศัพท์สำเร็จ!');
+                    }
+                } catch (err) {
+                    alert('ไฟล์ JSON ไม่ถูกต้อง');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Initialize game
+        nextQuestion();
+    </script>
+</body>
+</html>
